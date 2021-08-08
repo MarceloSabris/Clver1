@@ -76,7 +76,7 @@ for folder in folders:
                             i =0
                             result = File 
                             resultUltimo = File[:-5].replace('-','_').replace('.','_')
-                            arquivo = '15'
+                            arquivo = '15_teste2'
                             if 'Train' in File : 
                                 arquivo  = arquivo + "_Train_" 
                             else: 

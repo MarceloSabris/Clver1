@@ -50,8 +50,9 @@ where coguinitive = 'ResultPredication_Train_weights-improvement_02_0_99'
 delete from mestrado.processamento
 where coguinitive = 'ResultPredication_Train_weights_improvement_01_1_00'
 
+select * from mestrado.processamento
 
--- mestrado.processamento definition
+truncate table mestrado.processamento definition
 
 -- Drop table
 

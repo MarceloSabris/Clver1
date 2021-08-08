@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd   
 import os
@@ -9,17 +8,24 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import os
 import nltk
+import cv2
+import matplotlib.pyplot as plt
+import random
+from keras.preprocessing import text
+import os
+import nltk
 
 import cv2
 import matplotlib.pyplot as plt
 import random
-
-
+grupo = 0
+grupo = grupo + 1
 
 
 from os.path import isfile, join
 
 def GravarArquivo ( data_dict,fname):
+    print("gravar arquivo" + str(len(data)))
     if os.path.isfile(fname):
     # File exists
      with open(fname, 'a+') as outfile:
@@ -35,86 +41,97 @@ def GravarArquivo ( data_dict,fname):
         json.dump(data_dict, outfile, ensure_ascii=False, indent=4) 
         outfile.close()
 
-
-file_to_search = 'C:\\result'
+print('oi')
+file_to_search = 'C:\\result\\'
 folders = dirs = [d for d in os.listdir(file_to_search) if os.path.isdir(os.path.join(file_to_search, d))]
+print(folders)
 for folder in folders:
-    if 'percentage_05'  in folder:     
+    if 'percentage_05'  in folder:
+        
         qtd = 0 
-        tokenizer = tfds.deprecated.text.Tokenizer()
+     
         vocab_set=set()#set object used to store the vocabulary
         partSplit = folder.split('_')
         perc = partSplit[1]
-        FolderSource = file_to_search + '\\' + folder 
+        FolderSource = file_to_search + '//' + folder 
         Files = [f for f in os.listdir(FolderSource) if isfile(join(FolderSource, f))]
         posQues =[]
         valList=[]
         trainList=[]
         memorys = []
-
+        print(Files)
         for File in Files:
-            
-            if '.json' in File:
 
                 if 'vocab' in File : 
-                    with open(FolderSource + '\\' + File) as f:
-
-                        vocabs = json.load(f)
-                        for vocab in vocabs :
-                            print(vocab)
-                            vocab_set.add(vocab)
-                    encoder=tfds.deprecated.text.TokenTextEncoder(vocab_set)
-                elif 'ques' in File:     
-                    with open('C:\\Users\\Admin\\Downloads\\CLEVR_v1.0\\CLEVR_v1.0_1\\questions\\CLEVR_val_questions.json') as que:
-                        data = json.load(que)
-                        with open(FolderSource + '\\' + File) as f:
-                            ques = json.load(f)
-                            for que in ques :
                     
+                    with open(FolderSource + '//' + File) as f:
+
+                         vocabs = json.load(f)
+                         for vocab in vocabs :
+                            
+                            vocab_set.add(vocab)
+                    print('fim - vocab')
+
+                elif 'ques' in File:     
+                    with open('/home/kaggle/input/clevr-dataset/CLEVR_v1.0/questions/CLEVR_val_questions.json') as que:
+                        print("qes - inicio")
+                        data = json.load(que)
+                        with open(FolderSource + '//' + File) as f:
+                             ques = json.load(f)
+                             for que in ques :
                                 pos = que    
                                 i = data['questions'][pos]
                                 temp=[]
-                                for path in glob.glob('C:\\Users\\Admin\\Downloads\\CLEVR_v1.0\\CLEVR_v1.0_1\\images\\val\\'+i['image_filename']): 
+                                
+                                for path in glob.glob('/home/kaggle/input/clevr-dataset/CLEVR_v1.0/images/val/'+i['image_filename']): 
                                     temp.append(path)
-                                    temp.append(i['question'])
-                                    temp.append(i['answer'])
-                                    temp.append(pos)
-                                    valList.append(temp)
+                                temp.append(i['question'])
+                                temp.append(i['answer'])
+                                temp.append(pos)
+                                valList.append(temp)
                         f.close()
-                    
+                        print("qes - fim")
+
                 elif 'train' in File:
+                    print('train')
                     temp=[]    
-                    with open('C:\\Users\\Admin\\Downloads\\CLEVR_v1.0\\CLEVR_v1.0_1\\questions\\CLEVR_train_questions.json') as train:
+                    with open('/home/kaggle/input/clevr-dataset/CLEVR_v1.0/questions/CLEVR_train_questions.json') as train:
                         data = json.load(train)
-                        with open(FolderSource + '\\' + File) as f:
+                       
+                        with open(FolderSource + '//' + File) as f:
                             Ftrain = json.load(f)
                             for tr in Ftrain:
                                 pos = tr
+                              
                                 i = data['questions'][pos]
+                              
                                 temp=[]
-                                for path in glob.glob('C:\\Users\\Admin\\Downloads\\CLEVR_v1.0\\CLEVR_v1.0_1\\images\\train\\'+i['image_filename']): 
+                                for path in glob.glob('/home/kaggle/input/clevr-dataset/CLEVR_v1.0/images/train/'+i['image_filename']): 
                                     temp.append(path)
-                                    temp.append(i['question'])
-                                    temp.append(i['answer'])
-                                
-                                    trainList.append(temp)
+                                temp.append(i['question'])
+                                temp.append(i['answer'])
+                              
+                                trainList.append(temp)
                         f.close()
+                        
+                    print('train -fim')
                     train.close()
-            elif 'ckpt' in File and 'index' in File:
-                obj=[]
-                obj.append(perc)
-                obj.append(File[:-6])
-                memorys.append(obj)
-        
+                elif 'ckpt' in File and 'index' in File:
+                    obj=[]
+                    obj.append(perc)
+                    obj.append(File[:-6])
+                    memorys.append(obj)
+       
+        encoder=tfds.features.text.TokenTextEncoder(vocab_set)
         print("Testing the Encoder with sample questions - \n ")
         example_text=encoder.encode(trainList[1][1])
         print("Original Text = "+trainList[1][1])
 
         print("After Encoding = "+str(example_text))
         Traninlist=[]
-
+       
         for memory in memorys :
-            if 'weights-improvement-30' in memory[1]: 
+            if 'weights-improvement-30' in memory:
                 CNN_Input=tf.keras.layers.Input(shape=(200,200,3),name='image_input')
 
                 mobilenetv2=tf.keras.applications.mobilenet_v2.MobileNetV2(input_shape=(200,200,3), alpha=1.0, include_top=False,
@@ -136,7 +153,7 @@ for folder in folders:
 
 
                 concat=tf.keras.layers.concatenate([CNN_model.output,RNN_model.output])
-                dense_out=tf.keras.layers.Dense(len(vocab_set),activation='softmax',name='output')(concat)
+                dense_out=tf.keras.layers.Dense(len(vocab_set)+1,activation='softmax',name='output')(concat)
 
                 model = tf.keras.Model(inputs=[CNN_Input,RNN_Input],
                                 outputs=dense_out)
@@ -144,10 +161,10 @@ for folder in folders:
                         metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
                 model.summary()
 
-                filepath=FolderSource + '\\' + memory[1]  
-
+                filepath=FolderSource + '//' + memory[1]  
+                print(filepath)
                 model.load_weights(filepath)
-                
+                print(' ************ carregou *************')
                 #generate dates to test 
 
                 index=1
@@ -155,12 +172,10 @@ for folder in folders:
                 #1 - address 
                 ListasAcertasTrainlist = []
                 for contador in range(len(trainList)) :
-            # 
-                
-                    fig,axis=plt.subplots(1,2,figsize=(25, 8))
+
                     im=cv2.imread(trainList[contador][0])
                     im=cv2.resize(im,(200,200))
-                    q=trainList[contador][1]
+                    q=trainList[contador][1]  
                     q=encoder.encode(q)
                     paddings = [[0, 50-tf.shape(q)[0]]]
                     q=tf.pad(q, paddings, 'CONSTANT', constant_values=0)
@@ -171,19 +186,19 @@ for folder in folders:
                     decodAns = encoder.decode([np.argmax(ans)])
                     if trainList[contador][2] != decodAns :
                         ListasAcertasTrainlist.append(0)
-                        print('errou')
+
                     else:     
                         ListasAcertasTrainlist.append(1)
-                        print('acertou') 
-                    if len(ListasAcertasTrainlist) > 1 :
-                        GravarArquivo (ListasAcertasTrainlist,FolderSource + '/ResultPredication_Train_' +memory[1][:-5] +'.json')
-                        ListasAcertasTrainlist =[]
-                if len(ListasAcertasTrainlist) > 0 :
+                    if (contador%2000) == 0 : 
+                        GravarArquivo (ListasAcertasTrainlist,FolderSource + '/ResultPredication_Train_' +memory[1][:-5] +'.json')   
+                        print("grupo" + str(grupo ) )
+                        grupo = grupo + 1
+                        ListasAcertasTrainlist=[]
+                if (contador%2000) >= 0 :
                     GravarArquivo (ListasAcertasTrainlist,FolderSource + '/ResultPredication_Train_' +memory[1][:-5] +'.json')   
                 ListasValidacaolist = []
                 for contador in   range(len(valList)) :
-                    
-                    fig,axis=plt.subplots(1,2,figsize=(25, 8))
+
                     im=cv2.imread(valList[contador][0])
                     im=cv2.resize(im,(200,200))
                     q=valList[contador][1]
@@ -193,21 +208,22 @@ for folder in folders:
                     q=np.array(q)
                     im.resize(1,200,200,3)
                     q.resize(1,50)
+
                     ans=model.predict([im,q]) 
                     decodAns = encoder.decode([np.argmax(ans)])
                     if valList[contador][2] != decodAns :
                         ListasValidacaolist.append(0)
-                        print('errou')
+
                     else:     
                         ListasValidacaolist.append(1)
-                        print('acertou') 
-                    if len(ListasValidacaolist) > 1 :
-                        GravarArquivo (ListasValidacaolist,FolderSource + '/ResultPredication_Validacao_' +memory[1][:-5] +'.json')
-                        ListasValidacaolist =[]
-                if len(ListasAcertasTrainlist) > 0 :
-                    GravarArquivo (ListasAcertasTrainlist,FolderSource + '/ResultPredication_Train_' +memory[1][:-5] +'.json')   
-        
+                    if (contador%2000) == 0 : 
+                        GravarArquivo (ListasValidacaolist,FolderSource + '/ResultPredication_Val_' +memory[1][:-5] +'.json')   
+                      
+                        grupo = grupo +1
+                        ListasValidacaolist=[]     
+                if (contador%2000) >= 0 :      
+                     GravarArquivo (ListasValidacaolist,FolderSource + '/ResultPredication_Val_' +memory[1][:-5] +'.json')   
 
     
-
-
+    
+print('fim')

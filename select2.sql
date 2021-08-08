@@ -1,4 +1,18 @@
-SELECT linha, 
+SELECT linha,
+"15_teste2_Train__01_1_14" , 
+"15_teste2_Train__02_1_04" ,
+"15_teste2_Train__03_1_02" , 
+"15_teste2_Train__04_1_01" , 
+"15_teste2_Train__05_1_00"  , 
+"15_teste2_Train__06_1_00" , 
+"15_teste2_Train__07_1_00" , 
+"15_teste2_Val__01_1_14" , 
+"15_teste2_Val__02_1_04" , 
+"15_teste2_Val__03_1_02" , 
+"15_teste2_Val__04_1_01" , 
+"15_teste2_Val__05_1_00" , 
+"15_teste2_Val__06_1_00" ,
+"15_teste2_Val__07_1_00" , 
 "15_Train__01_1_06",
 "15_Train__02_1_04",
 "15_Val__01_1_06",
@@ -10,7 +24,15 @@ SELECT linha,
 "50_Train__01_1_00",
 "50_Train__02_0_99",
 "50_Val__01_1_00",
-"50_Val__02_0_99"
+"50_Val__02_0_99",
+"75_Train__01_1_02",
+"75_Train__02_1_03",
+"75_Val__01_1_02",
+"75_Val__02_1_03",
+"9_100_Train__01_0_99",
+"9_100_Train__02_0_99",
+"9_100_Val__01_0_99",
+"9_100_Val__02_0_99"
  FROM crosstab(
   $$
     SELECT ARRAY[linha]::text[], linha,  coguinitive, result
@@ -22,6 +44,20 @@ SELECT linha,
   $$
 ) AS c(rn text[], 
 linha int,
+"15_teste2_Train__01_1_14" int, 
+"15_teste2_Train__02_1_04" int,
+"15_teste2_Train__03_1_02" int , 
+"15_teste2_Train__04_1_01" int , 
+"15_teste2_Train__05_1_00"  int , 
+"15_teste2_Train__06_1_00" int , 
+"15_teste2_Train__07_1_00" int , 
+"15_teste2_Val__01_1_14" int , 
+"15_teste2_Val__02_1_04" int , 
+"15_teste2_Val__03_1_02" int , 
+"15_teste2_Val__04_1_01" int, 
+"15_teste2_Val__05_1_00" int, 
+"15_teste2_Val__06_1_00" int ,
+"15_teste2_Val__07_1_00" int, 
 "15_Train__01_1_06" int,
 "15_Train__02_1_04" int,
 "15_Val__01_1_06" int,
@@ -33,8 +69,17 @@ linha int,
 "50_Train__01_1_00" int,
 "50_Train__02_0_99" int,
 "50_Val__01_1_00" int,
-"50_Val__02_0_99" int )
+"50_Val__02_0_99" int, 
+"75_Train__01_1_02" int,
+"75_Train__02_1_03" int,
+"75_Val__01_1_02" int,
+"75_Val__02_1_03" int,
+"9_100_Train__01_0_99" int,
+"9_100_Train__02_0_99" int,
+"9_100_Val__01_0_99" int,
+"9_100_Val__02_0_99" int)
 --where ResultPredication_Train_weights_improvement_02_0_99 = '1'
- where "25_Train__02_0_99" = 1
- and "50_Train__02_0_99" = 0
+--where "25_Train__02_0_99" = 1
+-- and "9_100_Train__02_0_99" = 0
+
 order by linha
